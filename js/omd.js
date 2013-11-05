@@ -7,8 +7,15 @@ var googleEarth;
 var param = 'convergence';
 var time = 11;
 var date = 0;
+var theDate = "";
 var theOverlay = null;
-var serverDir = './out/'
+//var serverDir = './maps/'
+var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
+	
+var description = {"convergence":"Andamento dei venti al sulo e in rosso aree di massima convergenza",
+					"topbl":"Andamento dei venti in quota e altezza del Boundary Layer", 
+					"wstar":"Forza delle termiche",
+					"clouds":"Mappa della nuvolosita e pioggie"};
 
 google.load('earth', '1');
 google.maps.event.addDomListener(window, 'load', init);
@@ -60,19 +67,22 @@ function getOverlayName()
 
 	var data = gg + "" + mm + "" + aa;
 
+	theDate =  gg + "/" + mm + "/" + aa;
 	return ( data + "_"  + time + "_" +  param  )
 	
 }
 
 function loadImage(image)
 {
+	var newimg = serverDir+image+"_map.png";
 	if ( theOverlay != null )
 		theOverlay.setMap(null);
-	theOverlay = new google.maps.GroundOverlay("./maps/"+image+"_map.png",imageBounds);
+	theOverlay = new google.maps.GroundOverlay(newimg,imageBounds);
 	theOverlay.setOpacity(0.4);
 	theOverlay.setMap(map);
-	$("#img_legend").attr("src","./maps/"+image+"_legend.jpg");
-	//alert("./out/"+image+"_map.png");
+	$("#img_legend").attr("src",serverDir+image+"_legend.jpg");
+	$("#description").html(theDate + " - " + description[param]);
+	//alert(newimg);
 
 }
 

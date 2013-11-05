@@ -446,8 +446,8 @@ class OMDThread(threading.Thread):
 #             print  "{text: \""+parameter[1].lower()+"\", value:\""+parameter[1].lower()+"\"},"                       
 #         exit()
         
-        #parameters_2D = []
-        #parameters_Field2D =  [ ]
+        parameters_2D = [u'WSTAR']
+        parameters_Field2D =  [ ]
         
         for theTime in range(self.start,self.end+1):
             try:
