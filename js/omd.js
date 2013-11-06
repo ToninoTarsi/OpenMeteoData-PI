@@ -12,7 +12,7 @@ var theOverlay = null;
 //var serverDir = './maps/'
 var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
 	
-var description = {"convergence":"Andamento dei venti al sulo e in rosso aree di massima convergenza",
+var description = {"convergence":"Andamento dei venti al suolo e in rosso aree di massima convergenza",
 					"topbl":"Andamento dei venti in quota e altezza del Boundary Layer", 
 					"wstar":"Forza delle termiche",
 					"clouds":"Mappa della nuvolosita e pioggie"};

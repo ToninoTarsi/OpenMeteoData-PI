@@ -568,6 +568,8 @@ class FTPThread(threading.Thread):
     def add(self,map):
         self.list.append(map)
     
+    
+ 
 if __name__ == '__main__':    
     
     
