@@ -2,6 +2,9 @@
 //	new google.maps.LatLng(42.5, 12.00),
 //	new google.maps.LatLng(44.0, 13.5));
 
+var use_tiles = false;
+
+
 var map;
 var googleEarth;
 var param = 'convergence';
@@ -9,8 +12,10 @@ var time = 11;
 var date = 0;
 var theDate = "";
 var theOverlay = null;
-//var serverDir = './maps/'
-var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
+var image = "";
+
+var serverDir = './maps/'
+//var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
 	
 var description = {"convergence":"Andamento dei venti al suolo e in rosso aree di massima convergenza",
 					"topbl":"Andamento dei venti in quota e altezza del Boundary Layer", 
@@ -20,7 +25,33 @@ var description = {"convergence":"Andamento dei venti al suolo e in rosso aree d
 google.load('earth', '1');
 google.maps.event.addDomListener(window, 'load', init);
 
-
+var maptiler = new google.maps.ImageMapType({
+    getTileUrl: function(coord, zoom) { 
+        var proj = map.getProjection();
+        var z2 = Math.pow(2, zoom);
+        var tileXSize = 256 / z2;
+        var tileYSize = 256 / z2;
+        var tileBounds = new google.maps.LatLngBounds(
+                proj.fromPointToLatLng(new google.maps.Point(coord.x * tileXSize, (coord.y + 1) * tileYSize)),
+                proj.fromPointToLatLng(new google.maps.Point((coord.x + 1) * tileXSize, coord.y * tileYSize))
+            );        
+        
+        var y = coord.y;
+		y = (Math.pow(2,zoom)-coord.y-1); // Tony
+        if (imageBounds.intersects(tileBounds) && (7 <= zoom) && (zoom <= 12))
+        {
+        	//alert(serverDir + image +  "_map/" + zoom + "/" + coord.x + "/" + y + ".png");
+            //return newimg;
+            return serverDir + image +  "_map/" + zoom + "/" + coord.x + "/" + y + ".png";
+        }
+        	 
+        else
+            return "http://www.maptiler.org/img/none.png";
+    },
+    tileSize: new google.maps.Size(256, 256),
+    isPng: true,
+    opacity: 0.4
+});
 
 
 function init() {
@@ -74,22 +105,33 @@ function getOverlayName()
 
 function loadImage(image)
 {
-	var newimg = serverDir+image+"_map.png";
-	if ( theOverlay != null )
-		theOverlay.setMap(null);
-	theOverlay = new google.maps.GroundOverlay(newimg,imageBounds);
-	theOverlay.setOpacity(0.4);
-	theOverlay.setMap(map);
-	$("#img_legend").attr("src",serverDir+image+"_legend.jpg");
-	$("#description").html(theDate + " - " + description[param]);
-	//alert(newimg);
+	if ( ! use_tiles )
+	{
+		var newimg = serverDir+image+"_map.png";
+		if ( theOverlay != null )
+			theOverlay.setMap(null);
+		theOverlay = new google.maps.GroundOverlay(newimg,imageBounds);
+		theOverlay.setOpacity(0.4);
+		theOverlay.setMap(map);
+		$("#img_legend").attr("src",serverDir+image+"_legend.jpg");
+		$("#description").html(theDate + " - " + description[param]);
+		//alert(newimg);
+	}
+	else
+	{
+		//map.overlayMapTypes.removeAt(0);
+		//map.overlayMapTypes.removeAt(0)
+		map.overlayMapTypes.setAt(0, maptiler);
+		$("#img_legend").attr("src",serverDir+image+"_legend.jpg");
+		$("#description").html(theDate + " - " + description[param]);
+	}
 
 }
 
 function addOverlays() {
 	
-
-	loadImage(getOverlayName());
+	image = getOverlayName();
+	loadImage(image);
 	
 //	theOverlay = new google.maps.GroundOverlay("./out/25102013_11_vsfc_map.png",imageBounds);
 //	theOverlay.setOpacity(0.4);
@@ -101,8 +143,8 @@ function timeChanged(selectedValue, selectedName,element) {
 	if ( time != selectedValue )
 	{
 		time = selectedValue;
-		loadImage(getOverlayName());
-		
+		image = getOverlayName();
+		loadImage(image);		
 	}
 	
 } 
@@ -111,7 +153,8 @@ function dateChanged(selectedValue, selectedName,element) {
 	if ( date != selectedValue)
 	{
 		date = selectedValue;
-		loadImage(getOverlayName());
+		image = getOverlayName();
+		loadImage(image);	
 	}
 	  
 
@@ -121,8 +164,8 @@ function dateChanged(selectedValue, selectedName,element) {
 		if ( param != selectedValue)
 		{
 			param = selectedValue;
-			loadImage(getOverlayName());
-
+			image = getOverlayName();
+			loadImage(image);
 		}
 	}
   

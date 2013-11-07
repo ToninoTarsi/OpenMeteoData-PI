@@ -114,7 +114,9 @@ class config(object):
 		self.blipmap_boundingbox = config.get('General', 'blipmap_boundingbox',"12.00, 42.5 ,13.75 , 44.0")
 		self.contact = config.get('General', 'contact',"you@gmail.com")
 		self.statusUrl = config.get('General', 'statusUrl',"http://data2.rasp-france.org/status.php")
-
+		self.use_tiles = config.getboolean('General', 'use_tiles',False)
+		self.tiles_zooms = config.get('General', 'tiles_zooms',"9-12")
+		self.map_dpi = config.getint('General', 'map_dpi',50)
 
 
 
@@ -148,6 +150,10 @@ class config(object):
 		config.setstr('General', 'blipmap_boundingbox',self.blipmap_boundingbox)
 		config.setstr('General', 'contact',self.contact)
 		config.setstr('General', 'statusUrl',self.statusUrl)
+		config.setboolean('General', 'use_tiles',self.use_tiles)
+		config.setstr('General', 'tiles_zooms',self.tiles_zooms)
+		config.setint('General', 'map_dpi',self.map_dpi)
+
 
 
 

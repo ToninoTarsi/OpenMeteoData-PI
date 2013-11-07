@@ -19,9 +19,10 @@ import datetime
 import os
 import thread
 import config
+import gdal2tiles
 
 
-DPI = 50
+
 list_of_maps_to_send = []
 
 
@@ -39,22 +40,16 @@ def find_nearest_index1D(array,value):
 
 
 class OMDThread(threading.Thread):
-    def __init__(self ,server, domain, blipmap_boundingbox , windgram_places ,start,end ,contact , statusUrl ):
+    def __init__(self ,cfg  ):
+        self.cfg = cfg
         self.lastrun = ""
         self.lat = None
         self.lon = None
         self.latidx = None
         self.latidy = None
-        self.server = server
-        self.domain = domain
-        self.start = start
-        self.end = end
         self.mapGrid = {}
-        self.windgram_places = windgram_places
-        self.BB = dict(   lon=[ float(blipmap_boundingbox.split(",")[0]), float(blipmap_boundingbox.split(",")[2])],
-                          lat=[ float(blipmap_boundingbox.split(",")[1]), float(blipmap_boundingbox.split(",")[3])] )
-        self.contact = contact
-        self.statusUrl = statusUrl
+        self.BB = dict(   lon=[ float(cfg.blipmap_boundingbox.split(",")[0]), float(cfg.blipmap_boundingbox.split(",")[2])],
+                          lat=[ float(cfg.blipmap_boundingbox.split(",")[1]), float(cfg.blipmap_boundingbox.split(",")[3])] )
         self._stop = threading.Event()
         threading.Thread.__init__(self)
 
@@ -81,7 +76,7 @@ class OMDThread(threading.Thread):
     
     def getCurrentRun(self):
         
-        url = self.statusUrl + "?contact=" + self.contact
+        url = self.cfg.statusUrl + "?contact=" + self.cfg.contact
         json_data = requests.get(url, timeout=10).json()
         
         #print json.dumps(json_data["france"][0], sort_keys=False,indent=4) 
@@ -107,7 +102,7 @@ class OMDThread(threading.Thread):
             
     def plot2D_parameter(self,grid,filename):
       
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
        
@@ -119,10 +114,8 @@ class OMDThread(threading.Thread):
         
         plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
 
         fig1 = plt.figure(figsize=(11,11),dpi=100)
         cb = map.colorbar(cs2,"bottom", size="5%", pad="100%")
@@ -130,7 +123,7 @@ class OMDThread(threading.Thread):
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
 
         img1 = Image.open("maps/"+name)
         w, h = img1.size
@@ -141,7 +134,7 @@ class OMDThread(threading.Thread):
 
     def plot2D_field(self,gridu,gridv,module,direction,filename):
       
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -161,10 +154,8 @@ class OMDThread(threading.Thread):
 
         plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
 
         
         fig1 = plt.figure(figsize=(11,11),dpi=100)
@@ -173,7 +164,7 @@ class OMDThread(threading.Thread):
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
 
         
         img1 = Image.open("maps/"+name)
@@ -187,7 +178,7 @@ class OMDThread(threading.Thread):
       
         module = (np.sqrt(gridUSFC*gridUSFC+gridVSFC*gridVSFC))*3.6
         
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -216,20 +207,16 @@ class OMDThread(threading.Thread):
          
         plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
-        
         
         fig1 = plt.figure(figsize=(11,11),dpi=100)
         cb = map.colorbar(cs2,"bottom", size="5%", pad="100%")
         
-        
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
 
         img1 = Image.open("maps/"+name)
         w, h = img1.size
@@ -242,18 +229,16 @@ class OMDThread(threading.Thread):
       
         module = (np.sqrt(ugrid*ugrid+vgrid*vgrid))*3.6
         
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
         map = Basemap(llcrnrlon=self.BB['lon'][0],llcrnrlat=self.BB['lat'][0],urcrnrlon=self.BB['lon'][1],urcrnrlat=self.BB['lat'][1],
                       rsphere=(6378137.00,6356752.3142), resolution='l',projection='merc')
     
-
         x, y = map(Lon, Lat)
         cs2 = map.contourf(x,y,datagrid,512)
         
-
         levels = np.arange(0, 5000, 100)
         CS = map.contour(x,y,datagrid, levels, linewidths=0.01,colors = 'k')
         plt.clabel(CS,inline=1,fmt='%d')
@@ -271,11 +256,8 @@ class OMDThread(threading.Thread):
 
         plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
-
         
         
         # Legend
@@ -286,7 +268,7 @@ class OMDThread(threading.Thread):
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
 
         
         img1 = Image.open("maps/"+name)
@@ -295,6 +277,37 @@ class OMDThread(threading.Thread):
         area = img1.crop(box)
         area.save("maps/"+name, 'jpeg')
         plt.close()
+
+    def saveplot(self,plt,filename):
+        name = filename + '_map.png' 
+        plt.savefig("maps/"+name, dpi=self.cfg.map_dpi,bbox_inches='tight',transparent=True)
+        plt.close()
+        img1 = Image.open("maps/"+name)
+        x,y = img1.size
+        wf  = open("maps/" + filename + '_map.wld',"w")
+        px = ( self.BB['lon'][1] - self.BB['lon'][0] ) / ( x - 1)
+        wf.writelines(  "%.8f\n" %  px ) 
+        wf.writelines(  "0\n") 
+        wf.writelines(  "0\n") 
+        py = ( self.BB['lat'][0]- self.BB['lat'][1] ) / ( y - 1)
+        wf.writelines( "%.8f\n" % py  )      
+        wf.writelines( "%f\n" % ( self.BB['lon'][0])  ) 
+        wf.writelines( "%f\n" % ( self.BB['lat'][1])  ) 
+        wf.close()     
+        
+        
+        
+        if ( not self.cfg.use_tiles):
+            list_of_maps_to_send.append("maps/"+name)
+        else:
+            cwd = os.getcwd()
+            infile = os.path.join(cwd,"maps",name)
+            outdir = os.path.join(cwd,"maps",filename + "_map")
+            outdir_rel = os.path.join("maps",filename + "_map")
+            args = ["--s_srs","EPSG:4326","-z",self.cfg.tiles_zooms,infile,outdir ] # -w none
+            g2t = gdal2tiles.GDAL2Tiles(args )
+            g2t.process()
+            list_of_maps_to_send.append(outdir_rel)
 
     def plot_clouds(self,gridCFRACL,gridCFRACM,gridCFRACH,gridRAINTOT,gridSFCSUN,filename)  :
         
@@ -313,7 +326,7 @@ class OMDThread(threading.Thread):
         #module = ( gridCFRACL + gridCFRACM + gridCFRACH ) / 3 
         #module = gridSFCSUN
         
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
@@ -355,10 +368,8 @@ class OMDThread(threading.Thread):
         
         
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
         
         
         
@@ -370,7 +381,7 @@ class OMDThread(threading.Thread):
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
         
         
         img1 = Image.open("maps/"+name)
@@ -386,7 +397,7 @@ class OMDThread(threading.Thread):
       
         module = gridSUN
         
-        fig = plt.figure(figsize=(5,5),dpi=DPI)
+        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -400,10 +411,8 @@ class OMDThread(threading.Thread):
          
         plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
         
-        name = filename + '_map.png' 
-        plt.savefig("maps/"+name, dpi=DPI,bbox_inches='tight',transparent=True)
+        self.saveplot(plt,filename)
         plt.close()
-        list_of_maps_to_send.append(name)
 
         
         
@@ -415,7 +424,7 @@ class OMDThread(threading.Thread):
         name = filename + '_legend.jpg' 
         plt.savefig("maps/"+name, dpi=100,bbox_inches='tight',transparent=False)
         plt.close()
-        list_of_maps_to_send.append(name)
+        list_of_maps_to_send.append("maps/"+name)
 
         
         img1 = Image.open("maps/"+name)
@@ -449,12 +458,12 @@ class OMDThread(threading.Thread):
         parameters_2D = [u'WSTAR']
         parameters_Field2D =  [ ]
         
-        for theTime in range(self.start,self.end+1):
+        for theTime in range(self.cfg.start,self.cfg.end+1):
             try:
                 
                 timezone = time.timezone
                 utc_time = theTime + time.timezone / 3600
-                gridurl =  'http://dap001.teclib.omd-infra.net/a/rasp-france/%s-%s-%s_%s/%s_%s-%s-%s_%.2d:00:00.nc?contact=%s' % ( run[:4],run[4:6],run[6:8],run[8:10],self.domain,date[:4],date[4:6],date[6:8],utc_time,self.contact)
+                gridurl =  'http://dap001.teclib.omd-infra.net/a/rasp-france/%s-%s-%s_%s/%s_%s-%s-%s_%.2d:00:00.nc?contact=%s' % ( run[:4],run[4:6],run[6:8],run[8:10],self.cfg.domain,date[:4],date[4:6],date[6:8],utc_time,self.cfg.contact)
                 log( "Processing : Run : %s  - Day %s  - theTime : %s - file : %s" % ( run,date, str(theTime),gridurl))
                 dataset   = open_url(gridurl) 
                 
@@ -538,22 +547,36 @@ class FTPThread(threading.Thread):
         while 1:
             if ( len(list_of_maps_to_send) != 0)  :
                 map = list_of_maps_to_send.pop(0)
-                log("Sending [%d] %s to FTP Server" % (len(list_of_maps_to_send),map ) )
-                self.sendFileToFTPServer(map)
+                if os.path.isfile(map):
+                    log("Sending file [%d] %s to FTP Server" % (len(list_of_maps_to_send),map ) )
+                    self.sendFileToFTPServer(map)
+                elif os.path.isdir(map):
+                    log("Sending folder [%d] %s to FTP Server" % (len(list_of_maps_to_send),map ) )
+                    self.sendFolderToFTPServer(map)
             else:
                 time.sleep(10)
+    def  sendFolderToFTPServer(self,forder):
+        for current_dir, dirs, files in os.walk(forder):
+            for this_file in files:
+                filepath = os.path.join(current_dir, this_file)
+                self.sendFileToFTPServer(filepath) 
                 
     def sendFileToFTPServer(self,filename):
         try:
+            path,file=os.path.split(filename)
             s = ftplib.FTP(self.ftpserver,self.ftpserverlogin,self.ftpserverpassword,timeout=60)     # Connect
-            f = open("maps/"+filename,'rb')                # file to send
-            s.cwd(self.ftpserverdestfolder)
-            s.storbinary('STOR ' + filename, f)         # Send the file
+            f = open(filename,'rb')                # file to send
+            try:
+                s.mkd(self.ftpserverdestfolder+path)
+            except:
+                pass
+            s.cwd(self.ftpserverdestfolder+path)
+            s.storbinary('STOR ' + file, f)         # Send the file
             f.close()                                # Close file and FTP
             s.quit() 
             log("Sent file to server : " + filename)
             if self.delete : 
-                os.remove("maps/"+filename)
+                os.remove(filename)
                 log("Deleted file : " + filename )
             return True
         except Exception, err:
@@ -590,13 +613,13 @@ if __name__ == '__main__':
     except IOError:
         pass
     
-    list_of_maps_to_send.append("boundingbox.js")
+    list_of_maps_to_send.append("maps/boundingbox.js")
     
     
     ftp = FTPThread(cfg.ftpserver,cfg.ftpserverdestfolder,cfg.ftpserverLogin,cfg.ftpserverPassowd,False)
     ftp.start()
     
-    omd = OMDThread(cfg.server, cfg.domain, cfg.blipmap_boundingbox , cfg.windgram_places,cfg.start,cfg.end,cfg.contact , cfg.statusUrl )
+    omd = OMDThread(cfg)
     
     #omd.ProcessRun(run,date )
     #exit()
