@@ -436,7 +436,35 @@ class OMDThread(threading.Thread):
 
     def ProcessRun(self,run,date ):
         
-        
+        try:
+        # This will create a new file or **overwrite an existing file**.
+            f = open("./maps/boundingbox.js", "w")
+            line = "    var imageBounds = new google.maps.LatLngBounds("
+            f.writelines(line + "\n") 
+            line = "    new google.maps.LatLng(%s, %s)," % ( self.cfg.blipmap_boundingbox.split(",")[1],self.cfg.blipmap_boundingbox.split(",")[0]) 
+            f.writelines(line + "\n") 
+            line = "    new google.maps.LatLng(%s,%s));" % ( self.cfg.blipmap_boundingbox.split(",")[3],self.cfg.blipmap_boundingbox.split(",")[2])  
+            f.writelines(line+ "\n") 
+            if self.cfg.use_tiles :
+                val = "true"
+            else:
+                val = "false"
+            line = "    var use_tiles = %s;" % val
+            f.writelines(line + "\n") 
+            line = "    var zoom_min = %s;" % self.cfg.tiles_zooms.split("-")[0]
+            f.writelines(line + "\n")
+            line = "    var zoom_max = %s;" % self.cfg.tiles_zooms.split("-")[1]
+            f.writelines(line + "\n")
+            line = "    var run = %s;" % run
+            f.writelines(line + "\n")
+            line = "    var date = %s;" % date
+            f.writelines(line + "\n")
+            f.close()
+        except Exception,e: 
+            print str(e)
+            pass       
+    
+        list_of_maps_to_send.append("maps/boundingbox.js")
         
         parameters_2D = [u'SFCSUN', u'PBLTOP', u'WBLMAXMIN', u'ZBLCLMASK', u'V1000',  u'RAINC', u'BLTOPVARIAB', 
                           u'WSTAR', u'ZSFCLCLMASK',   u'CFRACH', u'BLWINDSHEAR', 
@@ -598,22 +626,7 @@ if __name__ == '__main__':
     
     cfg = config.config("./omdpi.cfg")
 
-    try:
-        # This will create a new file or **overwrite an existing file**.
-        f = open("./maps/boundingbox.js", "w")
-        try:
-            line = "    var imageBounds = new google.maps.LatLngBounds("
-            f.writelines(line + "\n") 
-            line = "    new google.maps.LatLng(%s, %s)," % ( cfg.blipmap_boundingbox.split(",")[1],cfg.blipmap_boundingbox.split(",")[0]) 
-            f.writelines(line + "\n") 
-            line = "    new google.maps.LatLng(%s,%s));" % ( cfg.blipmap_boundingbox.split(",")[3],cfg.blipmap_boundingbox.split(",")[2])  
-            f.writelines(line+ "\n") 
-        finally:
-            f.close()
-    except IOError:
-        pass
-    
-    list_of_maps_to_send.append("maps/boundingbox.js")
+
     
     
     ftp = FTPThread(cfg.ftpserver,cfg.ftpserverdestfolder,cfg.ftpserverLogin,cfg.ftpserverPassowd,False)
