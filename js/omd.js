@@ -15,17 +15,22 @@ var date = 0;
 var theDate = "";
 var theOverlay = null;
 var image = "";
+var waypointsLayer = null;
 
-//var serverDir = './maps/'
-var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
+
+var serverDir = './maps/'
+//var serverDir = 'http://www.vololiberomontecucco.it/omdpi/maps/'
 	
-var description = {"convergence":"Andamento dei venti al suolo e in rosso aree di massima convergenza",
-					"topbl":"Andamento dei venti in quota e altezza del Boundary Layer", 
-					"wstar":"Forza delle termiche",
+var description = {"convergence":"Andamento dei venti al suolo con intensita in rosso espressa in kmh mentre la campitura indica, in rosso, le aree di massima convergenza",
+					"topbl":"Andamento dei venti in quota con intensità in rosso espressa in kmh e altezza del Boundary Layer ( zona nella quale di hanno movimenti convettivi )", 
+					"wstar":"Intensità media delle termiche espressa in metri al secondo",
 					"clouds":"Mappa della nuvolosita e pioggie"};
 
 google.load('earth', '1');
 google.maps.event.addDomListener(window, 'load', init);
+
+
+waypointsLayer = new google.maps.KmlLayer(serverDir + 'waipoints.kml');
 
 var maptiler = new google.maps.ImageMapType({
     getTileUrl: function(coord, zoom) { 
@@ -59,6 +64,8 @@ var maptiler = new google.maps.ImageMapType({
 function init() {
     map = new google.maps.Map(document.getElementById('map'), {
       zoom: 10,
+      minZoom: zoom_min, 
+      maxZoom: zoom_max,
       center: new google.maps.LatLng(43.33733, 12.733563),
       mapTypeControlOptions: {
           mapTypeIds: [google.maps.MapTypeId.TERRAIN]
@@ -169,4 +176,16 @@ function dateChanged(selectedValue, selectedName,element) {
 			loadImage(image);
 		}
 	}
+  
+  function toggleWaipoints( element) {
+		if ( element.checked ) {
+			waypointsLayer.setMap(map);
+			//alert("Checkd");
+		}
+		else {
+			//alert("UnCheckd");
+			waypointsLayer.setMap(null);
+		}
+	}
+  
   

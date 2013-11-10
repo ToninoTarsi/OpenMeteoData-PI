@@ -21,7 +21,10 @@ import thread
 import config
 import gdal2tiles
 
+figsize = 4
 
+fontsize= figsize*4
+fontsize_meteo= figsize*6
 
 list_of_maps_to_send = []
 
@@ -102,7 +105,7 @@ class OMDThread(threading.Thread):
             
     def plot2D_parameter(self,grid,filename):
       
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
        
@@ -112,7 +115,7 @@ class OMDThread(threading.Thread):
         x, y = map(Lon, Lat)
         cs2 = map.contourf(x,y,grid,512)
         
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         self.saveplot(plt,filename)
         plt.close()
@@ -134,7 +137,7 @@ class OMDThread(threading.Thread):
 
     def plot2D_field(self,gridu,gridv,module,direction,filename):
       
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -152,7 +155,7 @@ class OMDThread(threading.Thread):
         lw =  lw = 1 + 4*module/module.max()
         map.streamplot(x,y,gridu,gridv, density=3, color='k', linewidth=lw , arrowsize=2 )
 
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         self.saveplot(plt,filename)
         plt.close()
@@ -178,7 +181,7 @@ class OMDThread(threading.Thread):
       
         module = (np.sqrt(gridUSFC*gridUSFC+gridVSFC*gridVSFC))*3.6
         
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -203,9 +206,9 @@ class OMDThread(threading.Thread):
                 ilon = self.lon[ix]
                 ilat = self.lat[iy]      
                 a,b = map(ilon,  ilat)
-                plt.text(a,b  ,int(module[iy,ix]),fontsize=18,fontweight='bold', ha='center',va='center',color='r')
+                plt.text(a,b  ,int(module[iy,ix]),fontsize=fontsize,fontweight='bold', ha='center',va='center',color='r')
          
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         self.saveplot(plt,filename)
         plt.close()
@@ -229,7 +232,7 @@ class OMDThread(threading.Thread):
       
         module = (np.sqrt(ugrid*ugrid+vgrid*vgrid))*3.6
         
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -252,9 +255,9 @@ class OMDThread(threading.Thread):
                 ilon = self.lon[ix]
                 ilat = self.lat[iy]      
                 a,b = map(ilon,  ilat)
-                plt.text(a,b  ,int(module[iy,ix]),fontsize=18,fontweight='bold', ha='center',va='center',color='r')
+                plt.text(a,b  ,int(module[iy,ix]),fontsize=fontsize,fontweight='bold', ha='center',va='center',color='r')
 
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         self.saveplot(plt,filename)
         plt.close()
@@ -304,7 +307,7 @@ class OMDThread(threading.Thread):
             infile = os.path.join(cwd,"maps",name)
             outdir = os.path.join(cwd,"maps",filename + "_map")
             outdir_rel = os.path.join("maps",filename + "_map")
-            args = ["--s_srs","EPSG:4326","-z",self.cfg.tiles_zooms,infile,outdir ] # -w none
+            args = ["-w","none","--s_srs","EPSG:4326","-z",self.cfg.tiles_zooms,infile,outdir ] # -w none
             g2t = gdal2tiles.GDAL2Tiles(args )
             g2t.process()
             list_of_maps_to_send.append(outdir_rel)
@@ -315,18 +318,18 @@ class OMDThread(threading.Thread):
         prop = font_manager.FontProperties(fname=fontpath)
         
         # constants
-        dpi = 72; 
-        imageSize = (256,256)
-        # read in our png file
-        im = img.imread("./img/smile.png")
-        
+#        dpi = 72; 
+#        imageSize = (256,256)
+#        # read in our png file
+#        im = img.imread("./img/smile.png")
+#        
 
         
         module = ( gridCFRACL + gridCFRACM  ) / 2
         #module = ( gridCFRACL + gridCFRACM + gridCFRACH ) / 3 
         #module = gridSFCSUN
         
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
@@ -353,18 +356,18 @@ class OMDThread(threading.Thread):
                 ilat = self.lat[iy]      
                 a,b = map(ilon,  ilat)
                 if ( gridRAINTOT[iy,ix] > 6 ) : 
-                    plt.text(a,b ,"8",fontsize=26,fontproperties=prop, ha='center',va='center',color='r')
+                    plt.text(a,b ,"8",fontsize=fontsize_meteo,fontproperties=prop, ha='center',va='center',color='r')
                 elif ( gridRAINTOT[iy,ix] > 2 ) :
-                    plt.text(a,b ,"!",fontsize=26,fontproperties=prop, ha='center',va='center',color='r')
+                    plt.text(a,b ,"!",fontsize=fontsize_meteo,fontproperties=prop, ha='center',va='center',color='r')
                 elif ( gridRAINTOT[iy,ix] > 0.1 ) :
-                    plt.text(a,b ,"7",fontsize=26,fontproperties=prop, ha='center',va='center',color='r')
+                    plt.text(a,b ,"7",fontsize=fontsize_meteo,fontproperties=prop, ha='center',va='center',color='r')
                 elif ( gridCFRACH[iy,ix] > 10 ) :
-                    plt.text(a,b ,"E",fontsize=26,fontproperties=prop, ha='center',va='center',color='r')    
+                    plt.text(a,b ,"E",fontsize=fontsize_meteo,fontproperties=prop, ha='center',va='center',color='r')    
                 elif ( gridCFRACM[iy,ix] > 10 or gridCFRACL[iy,ix] > 10 ) :
-                    plt.text(a,b ,"N",fontsize=26,fontproperties=prop, ha='center',va='center',color='r')
+                    plt.text(a,b ,"N",fontsize=fontsize_meteo,fontproperties=prop, ha='center',va='center',color='r')
 
                 
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         
         
@@ -397,7 +400,7 @@ class OMDThread(threading.Thread):
       
         module = gridSUN
         
-        fig = plt.figure(figsize=(5,5),dpi=self.cfg.map_dpi)
+        fig = plt.figure(figsize=(figsize,figsize),dpi=self.cfg.map_dpi)
         
         Lon,Lat = np.meshgrid(self.lon, self.lat)
         
@@ -409,7 +412,7 @@ class OMDThread(threading.Thread):
         #contour_levels = np.arange(10, 100, 1)
         cs2 = map.contourf(x,y,module,512,vmin=10)
          
-        plt.subplots_adjust(left=0.0, right=5.0, top=5.0, bottom=0.0)
+        plt.subplots_adjust(left=0.0, right=figsize, top=figsize, bottom=0.0)
         
         self.saveplot(plt,filename)
         plt.close()
@@ -435,6 +438,9 @@ class OMDThread(threading.Thread):
         plt.close()
 
     def ProcessRun(self,run,date ):
+        
+
+        
         
         try:
         # This will create a new file or **overwrite an existing file**.
@@ -486,9 +492,11 @@ class OMDThread(threading.Thread):
         parameters_2D = [u'WSTAR']
         parameters_Field2D =  [ ]
         
-        for theTime in range(self.cfg.start,self.cfg.end+1):
+        
+  
+        for  ttt in self.cfg.hours_to_process.split(','):
             try:
-                
+                theTime = int(ttt)
                 timezone = time.timezone
                 utc_time = theTime + time.timezone / 3600
                 gridurl =  'http://dap001.teclib.omd-infra.net/a/rasp-france/%s-%s-%s_%s/%s_%s-%s-%s_%.2d:00:00.nc?contact=%s' % ( run[:4],run[4:6],run[6:8],run[8:10],self.cfg.domain,date[:4],date[4:6],date[6:8],utc_time,self.cfg.contact)
@@ -503,17 +511,8 @@ class OMDThread(threading.Thread):
                     (self.lonidx,) = np.logical_and(self.lon >= self.BB['lon'][0], self.lon < self.BB['lon'][1]).nonzero()
                     self.lat = self.lat[self.latidx]
                     self.lon = self.lon[self.lonidx]
-                      
-                      
-                log(  "Plotting clouds   %s @ %s"  % ( date, str(theTime) ) )
-                gridCFRACL  = self.loadGrid(dataset,'CFRACL')
-                gridCFRACM  = self.loadGrid(dataset,'CFRACM') 
-                gridCFRACH  = self.loadGrid(dataset,'CFRACH')
-                gridRAINTOT = self.loadGrid(dataset,'RAINTOT')
-                gridSFCSUN = self.loadGrid(dataset,'SFCSUN')
-                filename = "%s%s%s_%.2d_clouds" % (date[6:8],date[4:6],date[:4],theTime) 
-                self.plot_clouds(gridCFRACL,gridCFRACM,gridCFRACH,gridRAINTOT,gridSFCSUN,filename)                    
                                 
+                          
                 log( "Plotting convergence  %s @ %s"  % ( date, str(theTime) ) )
                 gridUSFC  = self.loadGrid(dataset,'USFC')
                 gridVSFC  = self.loadGrid(dataset,'VSFC')
@@ -528,7 +527,14 @@ class OMDThread(threading.Thread):
                 filename = "%s%s%s_%.2d_topbl" % (date[6:8],date[4:6],date[:4],theTime) 
                 self.plot_topBL(gridPBLH,gridUBLTOP,gridVBLTOP,filename)                
                 
-
+                log(  "Plotting clouds   %s @ %s"  % ( date, str(theTime) ) )
+                gridCFRACL  = self.loadGrid(dataset,'CFRACL')
+                gridCFRACM  = self.loadGrid(dataset,'CFRACM') 
+                gridCFRACH  = self.loadGrid(dataset,'CFRACH')
+                gridRAINTOT = self.loadGrid(dataset,'RAINTOT')
+                gridSFCSUN = self.loadGrid(dataset,'SFCSUN')
+                filename = "%s%s%s_%.2d_clouds" % (date[6:8],date[4:6],date[:4],theTime) 
+                self.plot_clouds(gridCFRACL,gridCFRACM,gridCFRACH,gridRAINTOT,gridSFCSUN,filename)          
                 
                 for parameter in parameters_2D:
                     log(   "Plotting %s %s @ %s"  % (  parameter ,date, str(theTime) ) )
@@ -584,10 +590,39 @@ class FTPThread(threading.Thread):
             else:
                 time.sleep(10)
     def  sendFolderToFTPServer(self,forder):
-        for current_dir, dirs, files in os.walk(forder):
-            for this_file in files:
-                filepath = os.path.join(current_dir, this_file)
-                self.sendFileToFTPServer(filepath) 
+        try:
+            server_folder = ""
+            s = ftplib.FTP(self.ftpserver,self.ftpserverlogin,self.ftpserverpassword,timeout=60)     # Connect
+            for current_dir, dirs, files in os.walk(forder):
+                for this_file in files:
+                    filepath = os.path.join(current_dir, this_file)
+                    #self.sendFileToFTPServer(filepath) 
+                    f = open(filepath,'rb')                # file to send
+                    if ( server_folder != current_dir ) :
+                        server_folder = current_dir
+                        try:
+                            s.mkd(self.ftpserverdestfolder+current_dir)
+                        except:
+                            pass
+                        s.cwd(self.ftpserverdestfolder+current_dir)
+                    s.storbinary('STOR ' + this_file, f)         # Send the file
+                    f.close()                                # Close file and FTP
+                    #log("Sent file to server : " + this_file)
+                    if self.delete : 
+                        os.remove(this_file)
+                        log("Deleted file : " + this_file )
+            s.quit() 
+            log("Sent folder to server : " + forder)
+            if self.delete : 
+                os.rmdir(forder)
+                log("Deleted folder : " + forder )
+            return True            
+        except Exception, err:
+            print "Exception"
+            print '%s' % str(err)    
+            log("Error sending  folder to server : " + forder)
+            return False                   
+                    
                 
     def sendFileToFTPServer(self,filename):
         try:
@@ -628,9 +663,9 @@ if __name__ == '__main__':
 
 
     
-    
-    ftp = FTPThread(cfg.ftpserver,cfg.ftpserverdestfolder,cfg.ftpserverLogin,cfg.ftpserverPassowd,False)
-    ftp.start()
+    if (cfg.sent_to_server):
+        ftp = FTPThread(cfg.ftpserver,cfg.ftpserverdestfolder,cfg.ftpserverLogin,cfg.ftpserverPassowd,cfg.delete_after_sent)
+        ftp.start()
     
     omd = OMDThread(cfg)
     

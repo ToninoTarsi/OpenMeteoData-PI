@@ -117,16 +117,18 @@ class config(object):
 		self.use_tiles = config.getboolean('General', 'use_tiles',False)
 		self.tiles_zooms = config.get('General', 'tiles_zooms',"9-12")
 		self.map_dpi = config.getint('General', 'map_dpi',50)
+		self.hours_to_process = config.get('General', 'hours_to_process',"11,12,13,14,15,16,17.18")
 
 
 
 		# [ftp]
+		self.sent_to_server = config.getboolean('ftp', 'sent_to_server',True)
 		self.ftpserver = config.get('ftp', 'ftpserver',"ftp.yoursite.it")
 		self.ftpserverdestfolder = config.get('ftp', 'ftpserverdestfolder',"yoursite.it/img")
 		self.ftpserverLogin = config.get('ftp', 'ftpserverLogin',"xxxxxxxxx")
 		self.ftpserverPassowd = config.get('ftp', 'ftpserverPassowd',"xxxxxxxxxx")
 		self.use_thread_for_sending_to_server = config.getboolean('ftp', 'use_thread_for_sending_to_server',False)
-		
+		self.delete_after_sent = config.getboolean('ftp', 'delete_after_sent',False)
 
 
 		
@@ -153,16 +155,22 @@ class config(object):
 		config.setboolean('General', 'use_tiles',self.use_tiles)
 		config.setstr('General', 'tiles_zooms',self.tiles_zooms)
 		config.setint('General', 'map_dpi',self.map_dpi)
+		config.setstr('General', 'hours_to_process',self.hours_to_process)
 
 
 
 
 		# [ftp]
+		config.setboolean('ftp', 'sent_to_server',self.sent_to_server)		
 		config.setstr('ftp', 'ftpserver',self.ftpserver)
 		config.setstr('ftp', 'ftpserverdestfolder',self.ftpserverdestfolder)
 		config.setstr('ftp', 'ftpserverLogin',self.ftpserverLogin)
 		config.setstr('ftp', 'ftpserverPassowd',self.ftpserverPassowd)
 		config.setboolean('ftp', 'use_thread_for_sending_to_server',self.use_thread_for_sending_to_server)		
+		config.setboolean('ftp', 'delete_after_sent',self.delete_after_sent)		
+
+
+
 
 		f = open(self.cfgName,"w")
 		config.write(f)			
