@@ -4,6 +4,13 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>BLIPMAPS</title>
         <style>
+        
+      #time {display: inline-block; margin: 0 -4px 0 0; float: right;}  
+      #datetime {display: inline-block; margin: 0 -4px 0 0;}  
+     
+      #waipoints {display: inline-block; margin: 0 -4px 0 0; float: right;}  
+      #param {display: inline-block; margin: 0 -4px 0 0;}  
+       
       #map {
         height: 70%;
         margin: 0px;
@@ -71,33 +78,38 @@
   <body>
 
 <div id="content" style="width:100%; height:100%">
-<div id="datetime" >
-    <input type="radio" id="0" name="date" onclick="dateChanged('0','0',this)" href="javascript:void(0)" checked="checked" value="0" /><label for="0">Oggi</label>
-    <input type="radio" id="1" name="date" onclick="dateChanged('1','1',this)" href="javascript:void(0)"value="1" /><label for="1">Domani</label>
-	<span > - </span>
-	<input type="radio" id="11" name="time" value="11" onclick="timeChanged('11','11',this)" href="javascript:void(0)" checked="checked"  /><label for="11">11</label>
-	<input type="radio" id="12" name="time" value="12" onclick="timeChanged('12','12',this)" href="javascript:void(0)"/><label for="12">12</label>
-	<input type="radio" id="13" name="time" value="13" onclick="timeChanged('13','13',this)" href="javascript:void(0)"/><label for="13">13</label>
-	<input type="radio" id="14" name="time" value="14" onclick="timeChanged('14','14',this)" href="javascript:void(0)"/><label for="14">14</label>
-	<input type="radio" id="15" name="time" value="15" onclick="timeChanged('15','15',this)" href="javascript:void(0)"/><label for="15">15</label>
-	<input type="radio" id="16" name="time" value="16" onclick="timeChanged('16','16',this)" href="javascript:void(0)"/><label for="16">16</label>
-	<input type="radio" id="17" name="time" value="17" onclick="timeChanged('17','17',this)" href="javascript:void(0)"/><label for="17">17</label>
-	<input type="radio" id="18" name="time" value="18" onclick="timeChanged('18','18',this)" href="javascript:void(0)"/><label for="18">18</label>
-	<input type="radio" id="19" name="time" value="19" onclick="timeChanged('19','19',this)" href="javascript:void(0)"/><label for="19">19</label> 
 
-
-
+<div>
+	<div id="datetime" >
+	    <input type="radio" id="0" name="date" onclick="dateChanged('0','0',this)" href="javascript:void(0)" checked="checked" value="0" /><label for="0">Oggi</label>
+	    <input type="radio" id="1" name="date" onclick="dateChanged('1','1',this)" href="javascript:void(0)"value="1" /><label for="1">Domani</label>
+	</div>
+	<div id="time" >
+		<input type="radio" id="11" name="time" value="11" onclick="timeChanged('11','11',this)" href="javascript:void(0)" checked="checked"  /><label for="11">11</label>
+		<input type="radio" id="12" name="time" value="12" onclick="timeChanged('12','12',this)" href="javascript:void(0)"/><label for="12">12</label>
+		<input type="radio" id="13" name="time" value="13" onclick="timeChanged('13','13',this)" href="javascript:void(0)"/><label for="13">13</label>
+		<input type="radio" id="14" name="time" value="14" onclick="timeChanged('14','14',this)" href="javascript:void(0)"/><label for="14">14</label>
+		<input type="radio" id="15" name="time" value="15" onclick="timeChanged('15','15',this)" href="javascript:void(0)"/><label for="15">15</label>
+		<input type="radio" id="16" name="time" value="16" onclick="timeChanged('16','16',this)" href="javascript:void(0)"/><label for="16">16</label>
+		<input type="radio" id="17" name="time" value="17" onclick="timeChanged('17','17',this)" href="javascript:void(0)"/><label for="17">17</label>
+		<input type="radio" id="18" name="time" value="18" onclick="timeChanged('18','18',this)" href="javascript:void(0)"/><label for="18">18</label>
+		<input type="radio" id="19" name="time" value="19" onclick="timeChanged('19','19',this)" href="javascript:void(0)"/><label for="19">19</label> 
+	</div>
 </div>
-<div id="param" style="font-size: 70%;">
-	
-	<input type="radio" id="convergence" name="param" value="convergence" onclick="parameterChanged('convergence','convergence',this)" href="javascript:void(0)" checked="checked" /><label for="convergence">Mappa al suolo - Convergenza</label>
-	<input type="radio" id="topbl" name="param" value="topbl" onclick="parameterChanged('topbl','topbl',this)" href="javascript:void(0)"/><label for="topbl">Mappa in quota - Altezza del BL</label>
-	<input type="radio" id="clouds" name="param" value="clouds" onclick="parameterChanged('clouds','clouds',this)" href="javascript:void(0)"/><label for="clouds">Nuvole</label>
-	<input type="radio" id="wstar" name="param" value="wstar" onclick="parameterChanged('wstar','wstar',this)" href="javascript:void(0)"/><label for="wstar">Termiche</label>
-<!-- 	<select id="size">    </select> -->
-<!-- 	<input type="checkbox" id="fullScreen" /><label for="fullScreen">f</label> -->
-	-<input type="checkbox" id="check" onchange="toggleWaipoints(this)"/><label for="check">Visualizza boe</label>
+<div>
+	<div id="param" style="font-size: 70%;">
+		<input type="radio" id="convergence" name="param" value="convergence" onclick="parameterChanged('convergence','convergence',this)" href="javascript:void(0)" checked="checked" /><label for="convergence">Mappa al suolo - Convergenza</label>
+		<input type="radio" id="topbl" name="param" value="topbl" onclick="parameterChanged('topbl','topbl',this)" href="javascript:void(0)"/><label for="topbl">Mappa in quota - Altezza del BL</label>
+		<input type="radio" id="clouds" name="param" value="clouds" onclick="parameterChanged('clouds','clouds',this)" href="javascript:void(0)"/><label for="clouds">Nuvole</label>
+		<input type="radio" id="wstar" name="param" value="wstar" onclick="parameterChanged('wstar','wstar',this)" href="javascript:void(0)"/><label for="wstar">Termiche</label>
+	<!-- 	<select id="size">    </select> -->
+	<!-- 	<input type="checkbox" id="fullScreen" /><label for="fullScreen">f</label> -->
+	</div>
+	<div id="waipoints" style="font-size: 70%;"" >
+		<input type="checkbox" id="check" onchange="toggleWaipoints(this)"/><label for="check">Visualizza boe</label>
+	</div>
 </div>
+
     <div id="map"></div>
 
     <div id="legend">

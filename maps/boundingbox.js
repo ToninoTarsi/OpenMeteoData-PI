@@ -4,5 +4,5 @@
     var use_tiles = false;
     var zoom_min = 8;
     var zoom_max = 11;
-    var run = 2013110912;
-    var date = 20131110;
+    var run = 2013111206;
+    var date = 20131113;
