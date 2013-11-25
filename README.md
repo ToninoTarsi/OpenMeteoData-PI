@@ -5,6 +5,8 @@ Plotting utility for Open Meteo Data ( www.openmeteodata.org ) data
 
 Dependencies
 =========
+apt-get install libfreetype6-dev
+
 
 git clone git://github.com/matplotlib/matplotlib.git
 
@@ -37,3 +39,4 @@ cd ..
 sudo python setup.py install
 
 sudo apt-get install  python-gdal
+
