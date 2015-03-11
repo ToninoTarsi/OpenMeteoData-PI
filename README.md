@@ -25,6 +25,13 @@ sudo python setup.py install
 
 sudo apt-get install python-pip
 
+sudo easy_install pyparsing
+
+ sudo pip install python-dateutil
+ 
+ sudo apt-get -y install python-imaging
+ 
+
 sudo pip install Pydap
 
 cd ..
